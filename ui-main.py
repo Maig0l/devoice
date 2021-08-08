@@ -2,9 +2,10 @@ import sys
 from time import sleep
 from functools import partial
 from pathlib import Path
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QDialog
 from PyQt5.QtCore import QFile, QThread, QObject, pyqtSignal, pyqtSlot
 from devoice import Ui_MainWindow
+from ModalProgress import ModalProgress
 from DemucsWorker import DemucsWorker
 
 
@@ -21,11 +22,11 @@ class MainWindow(QMainWindow):
         
         self.ui.btn_inputOpen.clicked.connect(self.select_file)
         self.ui.btn_outOpen  .clicked.connect(self.select_out_dir)
-        self.ui.btn_go       .clicked.connect(self.call_demucs)
+        self.ui.btn_go       .clicked.connect(self.start_progress_modal)
 
         # DEBUG
-        self.ui.line_input.setText("/home/miguel/dox/projects/python/demucs-gui/snd/duvet.mp3")
-        self.ui.line_outDir.setText("/home/miguel/dox/projects/python/demucs-gui/out")
+        self.ui.line_input.setText("./test/snd/duvet.mp3")
+        self.ui.line_outDir.setText("./test/out")
 
     def select_file(self):
         # TODO: Add a check for file format
@@ -42,64 +43,9 @@ class MainWindow(QMainWindow):
         if dir:
             self.ui.line_outDir.setText(dir)
 
-    def call_demucs(self):
-        input = Path(self.ui.line_input.text())
-        outdir = Path(self.ui.line_outDir.text())
-        method = "demucs"   # eg. demucs, spleeter
-        #model = "demucs"   # eg. demucs, demucs_quantized
-        stems2 = self.ui.rad_stems2.isChecked()
-
-        # Prepare thread
-        self.thread = QThread()
-        if method == "demucs":
-            self.worker = DemucsWorker()
-
-        self.worker.moveToThread(self.thread)
-
-        # Connect signals
-        self.thread.started.connect(
-                partial(self.worker.run, input, outdir, 'demucs', stems2)
-            )
-        self.worker.step.connect(self.update_progress)
-        self.worker.statMsg.connect(self.showStatMsg)
-        self.worker.finished.connect(
-                lambda: self.workerFinishedHook(self.worker, self.thread)
-            )
-        self.thread.finished.connect(self.thread.deleteLater)
-
-        self.thread.start()
-
-        # UI responses
-        self.ui.btn_go.setVisible(False)
-        self.ui.btn_stop.setVisible(True)
-        self.ui.btn_stop.clicked.connect(
-                lambda: self.worker.stop()
-            )
-        self.thread.finished.connect(
-                lambda: self.ui.btn_go.setVisible(True)
-            )
-        self.thread.finished.connect(
-                lambda: self.ui.btn_stop.setVisible(False)
-            )
-        self.thread.finished.connect(
-                lambda: self.showStatMsg("%p%")
-            )
-
-    def workerFinishedHook(self, worker, thread):
-        worker.statMsg.emit("%p%")
-        worker.step.emit(0)
-        thread.quit()
-        worker.deleteLater()
-
-    @pyqtSlot(int)
-    def update_progress(self, progress):
-        self.ui.progressBar.setValue(progress)
-
-    @pyqtSlot(str)
-    def showStatMsg(self, msg):
-        print(msg)
-        self.ui.progressBar.setFormat(msg)
-
+    def start_progress_modal(self):
+        dial = ModalProgress(self)
+        dial.exec()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
