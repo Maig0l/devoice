@@ -2,7 +2,7 @@ import subprocess, os, platform
 from functools import partial
 from pathlib import Path
 from PyQt5.QtWidgets import QDialog
-from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import QThread, pyqtSlot
 from modal_progress import Ui_Dialog as Ui_ModalProgress
 from DemucsWorker import DemucsWorker
 
@@ -41,9 +41,7 @@ class ModalProgress(QDialog):
             )
         self.worker.step.connect(self.update_progress)
         self.worker.statMsg.connect(self.showStatMsg)
-        self.worker.finished.connect(
-                lambda: self.worker_finished_hook(self.worker, self.thread)
-            )
+        self.worker.finished.connect(self.worker_finished_hook)
         self.thread.finished.connect(self.thread.deleteLater)
 
         # Start & stop
@@ -52,12 +50,12 @@ class ModalProgress(QDialog):
                 lambda: self.worker.stop()
             )
 
-    def worker_finished_hook(self, worker, thread):
+    def worker_finished_hook(self):
         # TODO: Make a "Open outDir" button
         # TODO: Change Stop button to a Close button
         self.showStatMsg("Finished.")
-        thread.quit()
-        worker.deleteLater()
+        self.thread.quit()
+        self.worker.deleteLater()
 
         # Change button actions
         self.btn_stop_to_close()

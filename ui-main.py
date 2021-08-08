@@ -1,12 +1,7 @@
 import sys
-from time import sleep
-from functools import partial
-from pathlib import Path
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QDialog
-from PyQt5.QtCore import QFile, QThread, QObject, pyqtSignal, pyqtSlot
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
 from devoice import Ui_MainWindow
 from ModalProgress import ModalProgress
-from DemucsWorker import DemucsWorker
 
 
 class MainWindow(QMainWindow):

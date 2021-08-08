@@ -6,13 +6,11 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QApplication
 
 from demucs.pretrained import load_pretrained
-from demucs.audio import AudioFile
 from demucs.separate import load_track
 from demucs.utils import *
 
 import torch as th
 import torchaudio as ta
-from scipy.io import wavfile
 from pydub import AudioSegment
 
 class DemucsWorker(QObject):
