@@ -1,3 +1,4 @@
+import subprocess, os, platform
 from functools import partial
 from pathlib import Path
 from PyQt5.QtWidgets import QDialog
@@ -14,16 +15,18 @@ class ModalProgress(QDialog):
         self.ui = Ui_ModalProgress()
         self.ui.setupUi(self)
 
+        self.ui.btn_open.setVisible(False)
+
+        self.parentUi = self.parent().ui
         self.start_worker()
 
     def start_worker(self):
         # Gather options from main window
-        parentUi = self.parent().ui
-        input    = Path(parentUi.line_input.text())
-        outdir   = Path(parentUi.line_outDir.text())
+        input    = Path(self.parentUi.line_input.text())
+        outdir   = Path(self.parentUi.line_outDir.text())
         method   = "demucs"   # eg. demucs, spleeter
         model    = "demucs"   # eg. demucs, demucs_quantized [UNUSED]
-        stems2   = parentUi.rad_stems2.isChecked()
+        stems2   = self.parentUi.rad_stems2.isChecked()
 
         # Prepare thread
         self.thread = QThread()
@@ -55,6 +58,27 @@ class ModalProgress(QDialog):
         self.showStatMsg("Finished.")
         thread.quit()
         worker.deleteLater()
+
+        # Change button actions
+        self.btn_stop_to_close()
+
+        self.ui.btn_open.setVisible(True)
+        self.ui.btn_open.clicked.connect(
+                lambda: self.open_default_app(self.parentUi.line_outDir.text())
+            )
+
+    def btn_stop_to_close(self):
+        self.ui.btn_stop.setText("Close")
+        self.ui.btn_stop.clicked.disconnect()
+        self.ui.btn_stop.clicked.connect(self.close)
+
+    def open_default_app(self, path):
+        if platform.system() == 'Darwin':       # MacOS
+            subprocess.call(('open', path))
+        elif platform.system() == 'Windows':    # Windows
+            os.startfile(path)
+        else:                                   # Linux variants
+            subprocess.call(('xdg-open', path))
 
     @pyqtSlot(int)
     def update_progress(self, progress):

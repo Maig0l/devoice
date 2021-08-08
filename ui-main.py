@@ -9,9 +9,6 @@ from ModalProgress import ModalProgress
 from DemucsWorker import DemucsWorker
 
 
-# TODO: Show progress (and dispatch worker thread)
-#  from a modal_progress.py dialog
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()

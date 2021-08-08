@@ -11,22 +11,24 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.setWindowModality(QtCore.Qt.WindowModal)
         Dialog.setEnabled(True)
-        Dialog.resize(409, 78)
+        Dialog.resize(409, 83)
         Dialog.setModal(True)
         self.gridLayout = QtWidgets.QGridLayout(Dialog)
         self.gridLayout.setObjectName("gridLayout")
-        self.lbl_status = QtWidgets.QLabel(Dialog)
-        self.lbl_status.setObjectName("lbl_status")
-        self.gridLayout.addWidget(self.lbl_status, 2, 0, 1, 1)
         self.progressBar = QtWidgets.QProgressBar(Dialog)
         self.progressBar.setProperty("value", 0)
         self.progressBar.setObjectName("progressBar")
-        self.gridLayout.addWidget(self.progressBar, 0, 0, 2, 1)
+        self.gridLayout.addWidget(self.progressBar, 0, 0, 1, 1)
         self.btn_stop = QtWidgets.QPushButton(Dialog)
         self.btn_stop.setObjectName("btn_stop")
-        self.gridLayout.addWidget(self.btn_stop, 1, 1, 1, 1)
+        self.gridLayout.addWidget(self.btn_stop, 0, 1, 1, 1)
+        self.lbl_status = QtWidgets.QLabel(Dialog)
+        self.lbl_status.setObjectName("lbl_status")
+        self.gridLayout.addWidget(self.lbl_status, 1, 0, 1, 1)
+        self.btn_open = QtWidgets.QPushButton(Dialog)
+        self.btn_open.setObjectName("btn_open")
+        self.gridLayout.addWidget(self.btn_open, 1, 1, 1, 1)
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -34,6 +36,7 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Separating"))
-        self.lbl_status.setText(_translate("Dialog", "Status..."))
         self.btn_stop.setText(_translate("Dialog", "Cancel"))
+        self.lbl_status.setText(_translate("Dialog", "Status..."))
+        self.btn_open.setText(_translate("Dialog", "Open"))
 
