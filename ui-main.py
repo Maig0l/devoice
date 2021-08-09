@@ -1,5 +1,6 @@
-import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
+import os, sys
+import magic
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from devoice import Ui_MainWindow
 from ModalProgress import ModalProgress
 
@@ -36,8 +37,23 @@ class MainWindow(QMainWindow):
             self.ui.line_outDir.setText(dir)
 
     def start_progress_modal(self):
-        dial = ModalProgress(self)
-        dial.exec()
+        # Validate input
+        inFile = self.ui.line_input.text()
+        outDir = self.ui.line_outDir.text()
+
+        if not (inFile and outDir):
+            errMsg = ("Empty fields", "Please select an input file and an output directory.")
+        elif not os.path.isfile(inFile):
+            errMsg = ("File not found", "The file doesn't exist.")
+        elif "audio/" not in magic.from_file(inFile, mime=True):
+            errMsg = ("Incorrect file format", "Please select an audio file.")
+        else:
+            dial = ModalProgress(self)
+            dial.exec()
+            return True
+
+        QMessageBox.warning(self, errMsg[0], errMsg[1])
+        return False
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
