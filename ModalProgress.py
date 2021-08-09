@@ -51,8 +51,7 @@ class ModalProgress(QDialog):
             )
 
     def worker_finished_hook(self):
-        # TODO: Make a "Open outDir" button
-        # TODO: Change Stop button to a Close button
+        # TODO: If the worker finished with signal 1, don't show btn_open
         self.showStatMsg("Finished.")
         self.thread.quit()
         self.worker.deleteLater()
@@ -62,7 +61,7 @@ class ModalProgress(QDialog):
 
         self.ui.btn_open.setVisible(True)
         self.ui.btn_open.clicked.connect(
-                lambda: self.open_default_app(self.parentUi.line_outDir.text())
+                lambda: self.open_default_app(self.worker.track_folder)
             )
 
     def btn_stop_to_close(self):
@@ -72,11 +71,11 @@ class ModalProgress(QDialog):
 
     def open_default_app(self, path):
         if platform.system() == 'Darwin':       # MacOS
-            subprocess.call(('open', path))
+            subprocess.Popen(('nohup', 'open', path))
         elif platform.system() == 'Windows':    # Windows
             os.startfile(path)
         else:                                   # Linux variants
-            subprocess.call(('xdg-open', path))
+            subprocess.Popen(('nohup', 'xdg-open', path))
 
     @pyqtSlot(int)
     def update_progress(self, progress):

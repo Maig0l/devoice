@@ -154,10 +154,12 @@ class DemucsWorker(QObject):
             wavname = str(tmpDir / f"{stemName}.wav")
             ta.save(wavname, stemSrc, sample_rate=model.samplerate)
 
-        # Set up actual output directory
+        # Set up actual output directory.
+        # Track_folder becomes an object property to facilitate
+        #  access to its value to Open button in ModalProgress.
         self.statMsg.emit("Saving...")
-        track_folder = outDir / filename.name.rsplit(".", 1)[0]
-        track_folder.mkdir(exist_ok=True)
+        self.track_folder = outDir / filename.name.rsplit(".", 1)[0]
+        self.track_folder.mkdir(exist_ok=True)
 
         if stems2:
             sources = []
@@ -177,10 +179,9 @@ class DemucsWorker(QObject):
 
             codec = "flac"
             newName = stemName.rsplit(".", 1)[0] + f".{codec}"
-            stem.export(track_folder / newName, format=codec)
+            stem.export(self.track_folder / newName, format=codec)
 
         rmtree(tmpDir)
-        print("Finished")
         return True
 
     def run(self, filename, outDir, model="demucs", stems2=False):
