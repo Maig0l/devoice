@@ -50,19 +50,21 @@ class ModalProgress(QDialog):
                 lambda: self.worker.stop()
             )
 
-    def worker_finished_hook(self):
-        # TODO: If the worker finished with signal 1, don't show btn_open
-        self.showStatMsg("Finished.")
+    @pyqtSlot(int)
+    def worker_finished_hook(self, exitCode):
+        if exitCode == 0:
+            self.showStatMsg("Finished.")
+            self.ui.btn_open.setVisible(True)
+            self.ui.btn_open.clicked.connect(
+                    lambda: self.open_default_app(self.worker.track_folder)
+                )
+        else:
+            self.showStatMsg("Canceled.")
         self.thread.quit()
         self.worker.deleteLater()
 
         # Change button actions
         self.btn_stop_to_close()
-
-        self.ui.btn_open.setVisible(True)
-        self.ui.btn_open.clicked.connect(
-                lambda: self.open_default_app(self.worker.track_folder)
-            )
 
     def btn_stop_to_close(self):
         self.ui.btn_stop.setText("Close")
