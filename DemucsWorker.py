@@ -3,7 +3,6 @@ import os
 from pathlib import Path
 from shutil import rmtree
 from PyQt5.QtCore import QObject, pyqtSignal
-from PyQt5.QtWidgets import QApplication
 
 from demucs.pretrained import load_pretrained
 from demucs.separate import load_track
@@ -195,7 +194,4 @@ class DemucsWorker(QObject):
     def stop(self):
         self.statMsg.emit("Stopping...")
         self._running = False
-
-if __name__ == '__main__':
-    w = DemucsWorker()
 

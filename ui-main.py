@@ -22,7 +22,6 @@ class MainWindow(QMainWindow):
         self.ui.line_outDir.setText("./test/out")
 
     def select_file(self):
-        # TODO: Add a check for file format
         prev_selected = self.ui.line_input.text()
         filename = QFileDialog.getOpenFileName(self, "",
                     prev_selected,
@@ -37,21 +36,27 @@ class MainWindow(QMainWindow):
             self.ui.line_outDir.setText(dir)
 
     def start_progress_modal(self):
-        # Validate input
+        ## Check that file is good to use
         inFile = self.ui.line_input.text()
         outDir = self.ui.line_outDir.text()
 
+        # Check empty fields
         if not (inFile and outDir):
             errMsg = ("Empty fields", "Please select an input file and an output directory.")
+        # Check file exists
         elif not os.path.isfile(inFile):
             errMsg = ("File not found", "The file doesn't exist.")
+        # Check mimetype
         elif "audio/" not in magic.from_file(inFile, mime=True):
             errMsg = ("Incorrect file format", "Please select an audio file.")
+
+        # No errors? Good to go
         else:
             dial = ModalProgress(self)
             dial.exec()
             return True
 
+        ## Display the error message
         QMessageBox.warning(self, errMsg[0], errMsg[1])
         return False
 
