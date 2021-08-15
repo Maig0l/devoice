@@ -5,9 +5,12 @@ from PyQt5.QtWidgets import QDialog
 from PyQt5.QtCore import QThread, pyqtSlot
 from modal_progress import Ui_Dialog as Ui_ModalProgress
 from DemucsWorker import DemucsWorker
+from DebugWorker import DebugWorker
 
 # TODO: Either forcefully terminate thread on dialog close
 #  or disable OS close action
+
+# TODO: Open button depends on Worker thread data
 
 class ModalProgress(QDialog):
     def __init__(self, parent=None):
@@ -22,15 +25,18 @@ class ModalProgress(QDialog):
 
     def start_worker(self):
         # Gather options from main window
-        input    = Path(self.parentUi.line_input.text())
-        outdir   = Path(self.parentUi.line_outDir.text())
-        method   = "demucs"   # eg. demucs, spleeter
-        model    = "demucs"   # eg. demucs, demucs_quantized [UNUSED]
-        stems2   = self.parentUi.rad_stems2.isChecked()
+        input   = Path(self.parentUi.line_input.text())
+        outdir  = Path(self.parentUi.line_outDir.text())
+        #method  = "demucs"   # eg. demucs, spleeter
+        method  = self.parent().get_opts_method()
+        model   = "demucs"   # eg. demucs, demucs_quantized [UNUSED]
+        stems2  = self.parentUi.rad_stems2.isChecked()
 
         # Prepare thread
         self.thread = QThread()
-        if method == "demucs":
+        if method == "debug":
+            self.worker = DebugWorker()
+        elif method == "demucs":
             self.worker = DemucsWorker()
 
         self.worker.moveToThread(self.thread)

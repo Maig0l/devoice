@@ -89,6 +89,13 @@
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
+          <widget class="QRadioButton" name="rad_debug">
+           <property name="text">
+            <string>None (debug)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QRadioButton" name="rad_demucs">
            <property name="text">
             <string>De&amp;mucs</string>

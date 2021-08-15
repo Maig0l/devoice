@@ -60,6 +60,14 @@ class MainWindow(QMainWindow):
         QMessageBox.warning(self, errMsg[0], errMsg[1])
         return False
 
+    def get_opts_method(self):
+        if self.ui.rad_debug.isChecked():
+            return "debug"
+        elif self.ui.rad_demucs.isChecked():
+            return "demucs"
+        elif self.ui.rad_spleeter.isChecked():
+            return "spleeter"
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
